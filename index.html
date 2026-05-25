@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HabitGrow Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- ================= VIEW 1: TODAY / HABITS ================= -->
+        <div id="view-today" class="app-view active">
+            <header class="app-header">
+                <h1>Today</h1>
+                <p class="subtitle" id="lbl-date-sub">Daily Commitment Routing</p>
+            </header>
+
+            <!-- Deadline Alert (Only reveals if within 2 hours of deadline AND completion < 50%) -->
+            <div id="deadline-banner" class="deadline-warning" style="display: none;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Urgent: Completion is low! Finish tasks before <span id="lbl-deadline-alert">00:00</span> to save your pet's hearts!</span>
+            </div>
+
+            <div class="ios-card grid-stats">
+                <div>
+                    <span class="stat-val" id="ui-progress-rate">0%</span>
+                    <div class="stat-lbl">Completion Rate</div>
+                </div>
+                <div>
+                    <span class="stat-val" id="ui-active-habits">0</span>
+                    <div class="stat-lbl">Tracked Actions</div>
+                </div>
+            </div>
+
+            <section class="ios-card">
+                <form id="form-add-habit" class="habit-form-container">
+                    <input type="text" id="input-habit-title" class="ios-input" placeholder="Add a new daily habit..." required maxlength="40">
+                    
+                    <!-- Optional Reminder Controller -->
+                    <div class="form-row-picker">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="toggle-use-reminder" class="ios-switch-small">
+                            <label for="toggle-use-reminder" style="font-size: 14px; font-weight: 500;"><i class="fa-solid fa-bell"></i> Set Daily Reminder</label>
+                        </div>
+                        <input type="time" id="input-habit-reminder" class="ios-input-time" disabled style="opacity: 0.4;">
+                    </div>
+                    
+                    <button type="submit" class="btn-action-submit">Add Habit</button>
+                </form>
+            </section>
+
+            <main class="habits-container" id="dom-habits-box"></main>
+        </div>
+
+        <!-- ================= VIEW 2: COMPANION & SANCTUARY ================= -->
+        <div id="view-pet" class="app-view">
+            <header class="app-header">
+                <h1>Sanctuary</h1>
+                <p class="subtitle">Your Virtual Companion Ecosystem</p>
+            </header>
+
+            <div class="ios-card pet-stage-display" id="pet-mood-wrapper">
+                <div class="pet-wrapper">
+                    <div class="sleep-text">Zzz</div>
+                    <div class="pet-icon-frame" id="pet-render-frame"><i class="fa-solid fa-egg"></i></div>
+                </div>
+                <div class="id-pet-name" style="font-weight: 700; font-size: 19px;" id="pet-name-ui">Companion Egg</div>
+                <div class="hearts-row" id="pet-hearts-box"></div>
+                <p class="pet-status-subtext" id="pet-status-narrative" style="font-size: 13px; color: var(--text-muted); padding: 0 10px;"></p>
+                <div id="pet-mood-badge" class="mood-badge bg-neutral">Neutral</div>
+            </div>
+
+            <div class="ios-card">
+                <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 14px;">
+                    <span>Level <span id="val-level">1</span></span>
+                    <span style="color:#ffcc00;"><i class="fa-solid fa-coins"></i> <span id="val-coins">0</span> Gold</span>
+                </div>
+                <div class="xp-track-bg"><div class="xp-track-fill" id="val-xp-fill"></div></div>
+                <div class="stat-lbl" id="val-xp-text">0 / 100 XP</div>
+            </div>
+
+            <section class="ios-card">
+                <h3 style="font-size: 15px; font-weight: 700;"><i class="fa-solid fa-basket-shopping" style="color:var(--accent-color)"></i> Companion Interactions Store</h3>
+                <div class="shop-grid">
+                    <div class="shop-item-card">
+                        <div class="shop-item-icon"><i class="fa-solid fa-apple-whole" style="color:#ff3b30"></i></div>
+                        <div class="shop-item-title">Orchard Fruit</div>
+                        <div class="shop-item-desc">+15 XP Progression Boost</div>
+                        <button class="btn-buy" onclick="purchaseShopItem('fruit', 40)">Buy • 40g</button>
+                    </div>
+                    <div class="shop-item-card">
+                        <div class="shop-item-icon"><i class="fa-solid fa-cookie-bite" style="color:#b5651d"></i></div>
+                        <div class="shop-item-title">Affection Treat</div>
+                        <div class="shop-item-desc">+1 Vital Heart Restore</div>
+                        <button class="btn-buy" onclick="purchaseShopItem('treat', 75)">Buy • 75g</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= VIEW 3: SETTINGS ================= -->
+        <div id="view-settings" class="app-view">
+            <header class="app-header">
+                <h1>Settings</h1>
+                <p class="subtitle">System Engine Variables</p>
+            </header>
+
+            <!-- Operations Deadline -->
+            <div class="ios-card">
+                <h3 style="font-size:15px; font-weight:700; margin-bottom:4px;"><i class="fa-solid fa-business-time" style="color:var(--danger-color)"></i> Daily Operations Deadline</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Unfinished tasks drop streaks and penalize pet health at this hour if metrics are below 50%.</p>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px;">
+                    <input type="time" id="input-deadline-time" class="ios-input">
+                    <button class="btn-action-save" onclick="saveDeadlineValue()">Save Deadline</button>
+                </div>
+            </div>
+
+            <!-- Alert Configuration Panel -->
+            <div class="ios-card" style="padding: 4px 16px;">
+                <h3 style="font-size:15px; font-weight:700; margin:16px 0 8px 0;"><i class="fa-solid fa-bell" style="color:var(--accent-color)"></i> Alert Engine Settings</h3>
+                
+                <div class="setting-row">
+                    <div>
+                        <strong style="font-size:14px; display:block;">System Notifications</strong>
+                        <span style="font-size:11px; color:var(--text-muted);">Enable desktop app reminders</span>
+                    </div>
+                    <input type="checkbox" id="toggle-notifications" class="ios-switch">
+                </div>
+                
+                <div class="setting-row">
+                    <div>
+                        <strong style="font-size:14px; display:block;">Audio Alerts & Sound</strong>
+                        <span style="font-size:11px; color:var(--text-muted);">Play native chime on task alert</span>
+                    </div>
+                    <input type="checkbox" id="toggle-sounds" class="ios-switch">
+                </div>
+
+                <div class="setting-row" style="border:none;">
+                    <div>
+                        <strong style="font-size:14px; display:block;">Haptic Vibration</strong>
+                        <span style="font-size:11px; color:var(--text-muted);">Vibrate display on state failures</span>
+                    </div>
+                    <input type="checkbox" id="toggle-haptics" class="ios-switch">
+                </div>
+            </div>
+
+            <!-- System Theme & Reset Configurations -->
+            <div class="ios-card" style="padding: 4px 16px;">
+                <div class="setting-row">
+                    <div>
+                        <strong style="font-size:14px; display:block;">Dark Interface Mode</strong>
+                        <span style="font-size:11px; color:var(--text-muted);">Switch design configuration layers</span>
+                    </div>
+                    <input type="checkbox" id="toggle-dark-mode" class="ios-switch">
+                </div>
+                <div class="setting-row" style="border:none;">
+                    <div>
+                        <strong style="font-size:14px; display:block;">System Data Purge</strong>
+                        <span style="font-size:11px; color:var(--text-muted);">Clear application database parameters</span>
+                    </div>
+                    <button class="btn-reset-danger" onclick="purgeMemory()">Reset App</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Bottom Tab Strip -->
+        <nav class="tab-bar">
+            <button class="tab-item active" onclick="navigateTabs('view-today', this)">
+                <i class="fa-solid fa-calendar-day"></i>Today
+            </button>
+            <button class="tab-item" onclick="navigateTabs('view-pet', this)">
+                <i class="fa-solid fa-paw"></i>Companion
+            </button>
+            <button class="tab-item" onclick="navigateTabs('view-settings', this)">
+                <i class="fa-solid fa-sliders"></i>Settings
+            </button>
+        </nav>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
